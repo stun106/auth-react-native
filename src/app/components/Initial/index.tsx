@@ -10,19 +10,18 @@ export function Initial() {
         if (animation) {
           Animated.sequence([
             Animated.timing(fadeAnim, {
-              toValue: 1, // Opacidade vai para 1 (visível)
-              duration: 2000, // Duração de 2 segundos para aparecer
+              toValue: 1, // -> Opacidade vai para 1 (visível)
+              duration: 2000, // -> Duração de 2 segundos para aparecer
               useNativeDriver: true,
             }),
             Animated.timing(fadeAnim, {
-              toValue: 0, // Opacidade vai para 0 (invisível)
-              duration: 3000, // Duração de 3 segundos para desaparecer
+              toValue: 0, // -> Opacidade vai para 0 (invisível)
+              duration: 3000, // -> Duração de 3 segundos para desaparecer
               useNativeDriver: true,
             }),
           ]).start(() => {
-            console.log('Animação concluída, redirecionando...');
-            setAnimation(false); // Desativa a animação
-            router.replace('/about'); // Redireciona para a página "about"
+            setAnimation(false); // -> Desativa a animação
+            router.replace('/about'); // -> Redireciona para a página "about"
           });
         }
       }, [animation,fadeAnim, router]);

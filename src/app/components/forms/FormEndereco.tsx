@@ -22,6 +22,7 @@ export default function FormEndereco({ keyId }: FormEndereco) {
   });
 
   const constants = Constants.statusBarHeight;
+  
   return (
     <View className="flex-1">
       {/* Use ImageBackground para a imagem de fundo */}
