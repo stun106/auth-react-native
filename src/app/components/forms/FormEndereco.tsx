@@ -2,6 +2,7 @@ import { View, Text, Image, TextInput, Pressable, ImageBackground, ScrollView } 
 import Constants from 'expo-constants';
 import React, { useContext, useState } from 'react'
 import { RegisterContext } from '../../../data/context/Register';
+import { useRegister } from '../../../data/hook/Register';
 
 interface FormEndereco {
   keyId?: number;
@@ -9,6 +10,7 @@ interface FormEndereco {
 
 export default function FormEndereco({ keyId }: FormEndereco) {
   const { register, handleAddNewEndereco } = useContext(RegisterContext);
+  const { createUser } = useRegister();
   const [controleDeComponente, setControleDeComponente] = useState({
     endereco:
     {
@@ -20,6 +22,17 @@ export default function FormEndereco({ keyId }: FormEndereco) {
     }
 
   });
+
+  const handleCreateRegister = async () => {
+    try {
+        console.log(register)
+       const { data } = await createUser(register);
+        console.log('requisicão realizada com sucesso.', data )
+      
+    } catch (er) {
+      console.error('erro ao realizar requisicão!',er)
+    }
+  }
 
   const constants = Constants.statusBarHeight;
   
@@ -107,6 +120,7 @@ export default function FormEndereco({ keyId }: FormEndereco) {
               <Text>Salvar</Text>
             </Pressable>
             <Pressable
+              onPress={handleCreateRegister}
               className="flex justify-center items-center py-2 border border-slate-400 bg-slate-200 text-lg w-20 opacity-80 rounded-md"
             >
               <Text>Finalizar</Text>
