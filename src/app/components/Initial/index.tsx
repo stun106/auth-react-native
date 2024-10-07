@@ -25,8 +25,6 @@ export function Initial() {
           });
         }
       }, [animation,fadeAnim, router]);
-    
-    console.log(animation)
     return (
         <View className='w-full'>
             <Animated.Image 

@@ -1,6 +1,6 @@
 import { View, Text, Image, TextInput, Pressable, ImageBackground, ScrollView } from 'react-native';
 import Constants from 'expo-constants';
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { RegisterContext } from '../../../data/context/Register';
 import { useRegister } from '../../../data/hook/Register';
 
@@ -12,6 +12,7 @@ export default function FormEndereco({ keyId }: FormEndereco) {
   const { register, handleAddNewEndereco } = useContext(RegisterContext);
   const { createUser } = useRegister();
   const [controleDeComponente, setControleDeComponente] = useState({
+    isSwiper: false,
     endereco:
     {
       cep: '',
@@ -20,22 +21,29 @@ export default function FormEndereco({ keyId }: FormEndereco) {
       cidade: '',
       complemento: '',
     }
-
   });
+
+  useEffect(() => {
+    let formPreenchido = Object.keys(controleDeComponente.endereco).some(key => {
+      const value = controleDeComponente.endereco[key];
+      return value === '' || value === undefined || value === null;
+    });
+
+    setControleDeComponente(prevState => ({ ...prevState, isSwiper: formPreenchido }))
+  }, [controleDeComponente.endereco]);
 
   const handleCreateRegister = async () => {
     try {
-        console.log(register)
-       const { data } = await createUser(register);
-        console.log('requisicão realizada com sucesso.', data )
-      
+      console.log(register)
+      await createUser(register);
+      console.log('requisicão realizada com sucesso.')
+
     } catch (er) {
-      console.error('erro ao realizar requisicão!',er)
+      console.error('erro ao realizar requisicão!', er)
     }
   }
 
   const constants = Constants.statusBarHeight;
-  
   return (
     <View className="flex-1">
       {/* Use ImageBackground para a imagem de fundo */}
@@ -115,13 +123,14 @@ export default function FormEndereco({ keyId }: FormEndereco) {
           <View className="flex-row justify-between items-center w-full mt-4">
             <Pressable
               onPress={() => { handleAddNewEndereco(controleDeComponente.endereco); setControleDeComponente((prevState: any) => ({ ...prevState, endereco: { cep: '', rua: '', cidade: '', complemento: '' } })) }}
-              className="flex justify-center items-center py-2 border border-slate-400 bg-slate-200 text-lg w-20 opacity-80 rounded-md"
+              className={`flex justify-center items-center py-2 border border-slate-400 bg-slate-200 text-lg w-20 opacity-80 rounded-md" ${!controleDeComponente.isSwiper ? 'bg-green-300' : null}`}
             >
               <Text>Salvar</Text>
             </Pressable>
+
             <Pressable
               onPress={handleCreateRegister}
-              className="flex justify-center items-center py-2 border border-slate-400 bg-slate-200 text-lg w-20 opacity-80 rounded-md"
+              className={`flex justify-center items-center py-2 border border-slate-400 bg-slate-200 text-lg w-20 opacity-80 rounded-md ${register.endereco.length !== 1 ? 'bg-green-200' : register.endereco.length >= 2 ? 'bg-green-400' : null}"`}
             >
               <Text>Finalizar</Text>
             </Pressable>
@@ -131,7 +140,7 @@ export default function FormEndereco({ keyId }: FormEndereco) {
           {register.endereco.length !== 0 && (
             register.endereco.map((item, index) => (
               <View className=" flex justify-end my-5 py-3 pl-5 border border-slate-400 bg-slate-200 opacity-80 w-full rounded-lg">
-                <Pressable className='flex-row justify-between' key={index}>
+                <Pressable className="flex-row justify-between" key={index}>
                   <Text className="text-xl font-bold text-slate-800">{item.cidade} </Text>
                   <Text className='mr-10 text-lg font-thin text-slate-500'>press</Text>
                 </Pressable>
