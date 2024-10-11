@@ -1,4 +1,4 @@
-import { View, Text, Image, TextInput, Pressable, ImageBackground, ScrollView } from 'react-native';
+import { View, Text, Image, TextInput, Pressable, ImageBackground, ScrollView, FlatList } from 'react-native';
 import Constants from 'expo-constants';
 import React, { useContext, useEffect, useState } from 'react'
 import { RegisterContext } from '../../../data/context/Register';
@@ -134,18 +134,35 @@ export default function FormEndereco({ keyId }: FormEndereco) {
               <Text>Finalizar</Text>
             </Pressable>
           </View>
-
-          {/* Pre-visualização de Endereços */}
-          {register.endereco.length !== 0 && (
-            register.endereco.map((item, index) => (
+          {/* 
+          <FlatList 
+            data={register.endereco}
+            keyExtractor={(register, index) => index.toString()}
+            renderItem={({item}) => (
+              
               <View className=" flex justify-end my-5 py-3 pl-5 border border-slate-400 bg-slate-200 opacity-80 w-full rounded-lg">
-                <Pressable className="flex-row justify-between" key={index}>
-                  <Text className="text-xl font-bold text-slate-800">{item.cidade} </Text>
-                  <Text className='mr-10 text-lg font-thin text-slate-500'>press</Text>
+              <Pressable className="flex-row justify-between">
+                <Text className="text-xl font-bold text-slate-800">{item.cidade} </Text>
+                <Text className='mr-10 text-lg font-thin text-slate-500'>press</Text>
+              </Pressable>
+            </View>
+            )}
+          
+          /> */}
+          {register.endereco.length !== 0 ? (
+            register.endereco.map((item, index) => (
+              <View
+                key={index}
+                className="flex justify-end my-5 py-3 pl-5 border border-slate-400 bg-slate-200 opacity-80 w-full rounded-lg"
+              >
+                <Pressable className="flex-row justify-between">
+                  <Text className="text-xl font-bold text-slate-800">{item.cidade}</Text>
+                  <Text className="mr-10 text-lg font-thin text-slate-500">press</Text>
                 </Pressable>
               </View>
             ))
-          )}
+          ) : null
+          }
         </ScrollView>
       </ImageBackground>
     </View>
