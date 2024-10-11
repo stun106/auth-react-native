@@ -32,6 +32,8 @@ export default function FormEndereco({ keyId }: FormEndereco) {
     setControleDeComponente(prevState => ({ ...prevState, isSwiper: formPreenchido }))
   }, [controleDeComponente.endereco]);
 
+  console.log(controleDeComponente.isSwiper)
+
   const handleCreateRegister = async () => {
     try {
       await createUser(register);
@@ -122,33 +124,19 @@ export default function FormEndereco({ keyId }: FormEndereco) {
           <View className="flex-row justify-between items-center w-full mt-4">
             <Pressable
               onPress={() => { handleAddNewEndereco(controleDeComponente.endereco); setControleDeComponente((prevState: any) => ({ ...prevState, endereco: { cep: '', rua: '', cidade: '', complemento: '' } })) }}
-              className={`flex justify-center items-center py-2 border border-slate-400 bg-slate-200 text-lg w-20 opacity-80 rounded-md" ${!controleDeComponente.isSwiper ? 'bg-green-300' : null}`}
+              className={`flex justify-center items-center py-2 border border-slate-400 bg-slate-200 text-lg w-20 opacity-80 rounded-lg ${!controleDeComponente.isSwiper ? 'bg-green-500' : null}`}
             >
               <Text>Salvar</Text>
             </Pressable>
 
             <Pressable
               onPress={handleCreateRegister}
-              className={`flex justify-center items-center py-2 border border-slate-400 bg-slate-200 text-lg w-20 opacity-80 rounded-md ${register.endereco.length !== 1 ? 'bg-green-200' : register.endereco.length >= 2 ? 'bg-green-400' : null}"`}
+              className={`flex justify-center items-center py-2 border border-slate-400 bg-slate-200 text-lg w-20 opacity-80 rounded-lg ${register.endereco.length >= 1 && 'bg-green-500'}`}
             >
               <Text>Finalizar</Text>
             </Pressable>
           </View>
-          {/* 
-          <FlatList 
-            data={register.endereco}
-            keyExtractor={(register, index) => index.toString()}
-            renderItem={({item}) => (
-              
-              <View className=" flex justify-end my-5 py-3 pl-5 border border-slate-400 bg-slate-200 opacity-80 w-full rounded-lg">
-              <Pressable className="flex-row justify-between">
-                <Text className="text-xl font-bold text-slate-800">{item.cidade} </Text>
-                <Text className='mr-10 text-lg font-thin text-slate-500'>press</Text>
-              </Pressable>
-            </View>
-            )}
-          
-          /> */}
+
           {register.endereco.length !== 0 ? (
             register.endereco.map((item, index) => (
               <View
