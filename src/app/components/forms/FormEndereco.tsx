@@ -34,7 +34,6 @@ export default function FormEndereco({ keyId }: FormEndereco) {
 
   const handleCreateRegister = async () => {
     try {
-      console.log(register)
       await createUser(register);
       console.log('requisicão realizada com sucesso.')
 
@@ -42,7 +41,7 @@ export default function FormEndereco({ keyId }: FormEndereco) {
       console.error('erro ao realizar requisicão!', er)
     }
   }
-
+  console.log(register)
   const constants = Constants.statusBarHeight;
   return (
     <View className="flex-1">
@@ -52,7 +51,7 @@ export default function FormEndereco({ keyId }: FormEndereco) {
         className="w-full h-full"
         resizeMode="cover"
       >
-        <ScrollView contentContainerStyle={{ padding: 20, flexGrow: 1 }}>
+        <ScrollView contentContainerStyle={{ padding: 20, flexGrow: 1, marginTop: constants }}>
 
           {/* Inputs de Endereço */}
           <View className="gap-4">

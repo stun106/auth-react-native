@@ -31,7 +31,7 @@ export default function FormDocuments({ keyId }: FormDocumentsProps) {
       />
 
       {
-        !controleComponente.isSwiper && (
+        !controleComponente.isSwiper && register.senha.length >= 6 ? (
           <>
           
                 <View className="absolute z-30 shadow-inner  justify-between items-center">
@@ -44,7 +44,7 @@ export default function FormDocuments({ keyId }: FormDocumentsProps) {
                 </View>
            
           </>
-        )
+        ) : null
       }
       <TextInput
         value={register.nome}
