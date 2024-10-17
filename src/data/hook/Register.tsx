@@ -28,8 +28,7 @@ export const useRegister = () => {
 
     const getEnderecoByViaCep = useCallback(async(cep:string) => {
         const { status , data } = await RegisterService.viaCepService(cep);
-        setEndereco(data);
-        return status;
+        return data;
     },[])
 
     return {

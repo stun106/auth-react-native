@@ -1,4 +1,4 @@
-import { View, Text, Image, TextInput, Pressable, ImageBackground, ScrollView, FlatList } from 'react-native';
+import { View, Text, Image, TextInput, Pressable, ImageBackground, ScrollView } from 'react-native';
 import Constants from 'expo-constants';
 import React, { useContext, useEffect, useState } from 'react'
 import { RegisterContext } from '../../../data/context/Register';
@@ -10,11 +10,12 @@ interface FormEndereco {
 
 export default function FormEndereco({ keyId }: FormEndereco) {
   const { register, handleAddNewEndereco } = useContext(RegisterContext);
-  const { createUser, getEnderecoByViaCep, getEndereco } = useRegister();
+  const { createUser, getEnderecoByViaCep } = useRegister();
   const [controleDeComponente, setControleDeComponente] = useState({
     isSwiper: false,
     status: 0,
     isfetch: false,
+    isLoading:undefined,
     endereco:
     {
       cep: '',
@@ -39,10 +40,9 @@ export default function FormEndereco({ keyId }: FormEndereco) {
       try {
         if (controleDeComponente.endereco.cep.length < 8) setControleDeComponente(prevState => ({ ...prevState, isfetch: false }))
         if (controleDeComponente.endereco.cep.length === 8) {
-          const status = await getEnderecoByViaCep(controleDeComponente.endereco.cep);
+          const getEndereco:ViaCep = await getEnderecoByViaCep(controleDeComponente.endereco.cep);
           setControleDeComponente(prevState => ({
             ...prevState,
-            status: status,
             isfetch: true,
             endereco: {
               ...prevState.endereco,
@@ -58,12 +58,19 @@ export default function FormEndereco({ keyId }: FormEndereco) {
         console.error(`erro: ${controleDeComponente.status} - ao receber dados da api`, e)
       }
     }
-    fetchEnderecoViaCep();
-  }, [controleDeComponente.endereco.cep])
+      fetchEnderecoViaCep();
+  }, [controleDeComponente.endereco.cep]);
 
+  
+
+  console.log(register)
+  console.log(controleDeComponente.endereco)
+  
   const handleCreateRegister = async () => {
     try {
+      setControleDeComponente(prevState => ({...prevState, isLoading: false}));
       await createUser(register);
+      setControleDeComponente(prevState => ({...prevState, isLoading: true}));
       console.log('requisicão realizada com sucesso.')
 
     } catch (er) {
@@ -104,7 +111,7 @@ export default function FormEndereco({ keyId }: FormEndereco) {
               placeholder="CEP..."
             />
             <TextInput
-              value={controleDeComponente.endereco.cep.length < 8 ? undefined : getEndereco.logradouro}
+              value={controleDeComponente.endereco.cep.length < 8 ? undefined : controleDeComponente.endereco.rua}
               onChangeText={(value) => setControleDeComponente(prevState => ({
                 ...prevState,
                 endereco: {
@@ -116,7 +123,7 @@ export default function FormEndereco({ keyId }: FormEndereco) {
               placeholder="Rua..."
             />
             <TextInput
-              value={controleDeComponente.endereco.cep.length < 8 ? undefined : getEndereco.bairro}
+              value={controleDeComponente.endereco.cep.length < 8 ? undefined : controleDeComponente.endereco.bairro}
               onChangeText={(value) => setControleDeComponente(prevState => ({
                 ...prevState,
                 endereco: {
@@ -128,7 +135,7 @@ export default function FormEndereco({ keyId }: FormEndereco) {
               placeholder="Bairro..."
             />
             <TextInput
-              value={controleDeComponente.endereco.cep.length < 8 ? undefined : getEndereco.localidade}
+              value={controleDeComponente.endereco.cep.length < 8 ? undefined : controleDeComponente.endereco.cidade}
               onChangeText={(value) => setControleDeComponente(prevState => ({
                 ...prevState,
                 endereco: {
