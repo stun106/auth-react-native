@@ -10,9 +10,11 @@ interface FormEndereco {
 
 export default function FormEndereco({ keyId }: FormEndereco) {
   const { register, handleAddNewEndereco } = useContext(RegisterContext);
-  const { createUser } = useRegister();
+  const { createUser, getEnderecoByViaCep, getEndereco } = useRegister();
   const [controleDeComponente, setControleDeComponente] = useState({
     isSwiper: false,
+    status: 0,
+    isfetch: false,
     endereco:
     {
       cep: '',
@@ -32,7 +34,32 @@ export default function FormEndereco({ keyId }: FormEndereco) {
     setControleDeComponente(prevState => ({ ...prevState, isSwiper: formPreenchido }))
   }, [controleDeComponente.endereco]);
 
-  console.log(controleDeComponente.isSwiper)
+  useEffect(() => {
+    const fetchEnderecoViaCep = async () => {
+      try {
+        if (controleDeComponente.endereco.cep.length < 8) setControleDeComponente(prevState => ({ ...prevState, isfetch: false }))
+        if (controleDeComponente.endereco.cep.length === 8) {
+          const status = await getEnderecoByViaCep(controleDeComponente.endereco.cep);
+          setControleDeComponente(prevState => ({
+            ...prevState,
+            status: status,
+            isfetch: true,
+            endereco: {
+              ...prevState.endereco,
+              rua: getEndereco.logradouro,
+              bairro: getEndereco.bairro,
+              cidade: getEndereco.localidade,
+              complemento: getEndereco.complemento,
+            }
+          }))
+        }
+
+      } catch (e) {
+        console.error(`erro: ${controleDeComponente.status} - ao receber dados da api`, e)
+      }
+    }
+    fetchEnderecoViaCep();
+  }, [controleDeComponente.endereco.cep])
 
   const handleCreateRegister = async () => {
     try {
@@ -43,7 +70,13 @@ export default function FormEndereco({ keyId }: FormEndereco) {
       console.error('erro ao realizar requisicão!', er)
     }
   }
-  console.log(register)
+
+  const submitColor = () => {
+    if (controleDeComponente.isfetch) return 'bg-green-400';
+    return 'bg-slate-200'
+
+  }
+  console.log(controleDeComponente.isfetch)
   const constants = Constants.statusBarHeight;
   return (
     <View className="flex-1">
@@ -71,7 +104,7 @@ export default function FormEndereco({ keyId }: FormEndereco) {
               placeholder="CEP..."
             />
             <TextInput
-              value={controleDeComponente.endereco.rua}
+              value={controleDeComponente.endereco.cep.length < 8 ? undefined : getEndereco.logradouro}
               onChangeText={(value) => setControleDeComponente(prevState => ({
                 ...prevState,
                 endereco: {
@@ -83,7 +116,7 @@ export default function FormEndereco({ keyId }: FormEndereco) {
               placeholder="Rua..."
             />
             <TextInput
-              value={controleDeComponente.endereco.bairro}
+              value={controleDeComponente.endereco.cep.length < 8 ? undefined : getEndereco.bairro}
               onChangeText={(value) => setControleDeComponente(prevState => ({
                 ...prevState,
                 endereco: {
@@ -95,7 +128,7 @@ export default function FormEndereco({ keyId }: FormEndereco) {
               placeholder="Bairro..."
             />
             <TextInput
-              value={controleDeComponente.endereco.cidade}
+              value={controleDeComponente.endereco.cep.length < 8 ? undefined : getEndereco.localidade}
               onChangeText={(value) => setControleDeComponente(prevState => ({
                 ...prevState,
                 endereco: {
@@ -124,7 +157,7 @@ export default function FormEndereco({ keyId }: FormEndereco) {
           <View className="flex-row justify-between items-center w-full mt-4">
             <Pressable
               onPress={() => { handleAddNewEndereco(controleDeComponente.endereco); setControleDeComponente((prevState: any) => ({ ...prevState, endereco: { cep: '', rua: '', cidade: '', complemento: '' } })) }}
-              className={`flex justify-center items-center py-2 border border-slate-400 bg-slate-200 text-lg w-20 opacity-80 rounded-lg ${!controleDeComponente.isSwiper ? 'bg-green-500' : null}`}
+              className={`flex justify-center items-center py-2 border border-slate-400 ${submitColor()} text-lg w-20 opacity-80 rounded-lg`}
             >
               <Text>Salvar</Text>
             </Pressable>

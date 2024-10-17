@@ -1,7 +1,23 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { RegisterService } from "../service/RegisterService";
 
 export const useRegister = () => {
+    const [getEndereco, setEndereco] = useState<ViaCep>({
+        cep: '',
+        logradouro: '',
+        complemento: '',
+        unidade: '',
+        bairro: '',
+        localidade: '',
+        uf: '',
+        estado: '',
+        regiao: '',
+        ibge: '',
+        gia: '',
+        ddd: '',
+        siafi: '',
+    });
+
     const createUser = useCallback(async (registro: Register) => {
    
             const { status, data } = await RegisterService.createUsuario(registro);
@@ -10,7 +26,15 @@ export const useRegister = () => {
        
     }, []);
 
+    const getEnderecoByViaCep = useCallback(async(cep:string) => {
+        const { status , data } = await RegisterService.viaCepService(cep);
+        setEndereco(data);
+        return status;
+    },[])
+
     return {
+        getEndereco,
         createUser,
+        getEnderecoByViaCep,
     };
 };
