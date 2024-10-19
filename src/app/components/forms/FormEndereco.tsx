@@ -1,8 +1,10 @@
 import { View, Text, Image, TextInput, Pressable, ImageBackground, ScrollView } from 'react-native';
 import Constants from 'expo-constants';
-import React, { useContext, useEffect, useState } from 'react'
+import { Ionicons } from '@expo/vector-icons';
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { RegisterContext } from '../../../data/context/Register';
 import { useRegister } from '../../../data/hook/Register';
+import { LoadingSpinner } from '../LoadingSpinner';
 
 interface FormEndereco {
   keyId?: number;
@@ -15,7 +17,7 @@ export default function FormEndereco({ keyId }: FormEndereco) {
     isSwiper: false,
     status: 0,
     isfetch: false,
-    isLoading:undefined,
+    isLoading:false,
     endereco:
     {
       cep: '',
@@ -58,23 +60,26 @@ export default function FormEndereco({ keyId }: FormEndereco) {
         console.error(`erro: ${controleDeComponente.status} - ao receber dados da api`, e)
       }
     }
+    if (controleDeComponente.endereco.cep.length < 8)
       fetchEnderecoViaCep();
   }, [controleDeComponente.endereco.cep]);
-
-  
-
-  console.log(register)
-  console.log(controleDeComponente.endereco)
   
   const handleCreateRegister = async () => {
     try {
-      setControleDeComponente(prevState => ({...prevState, isLoading: false}));
-      await createUser(register);
-      setControleDeComponente(prevState => ({...prevState, isLoading: true}));
+      const statusCode = await createUser(register);
+      setControleDeComponente(prevState => ({...prevState, status:statusCode, isLoading: true}));
+      setInterval(() => {
+        setControleDeComponente(prevState => ({...prevState, isLoading: false}));
+      },1000);
+
+      //fadeOut
       console.log('requisicão realizada com sucesso.')
 
     } catch (er) {
       console.error('erro ao realizar requisicão!', er)
+    }
+    finally {
+      console.log('deu tudo certo!')
     }
   }
 
@@ -83,7 +88,13 @@ export default function FormEndereco({ keyId }: FormEndereco) {
     return 'bg-slate-200'
 
   }
-  console.log(controleDeComponente.isfetch)
+
+  const finalizarColor = () => {
+    if (register.endereco.length > 0) {
+      return 'bg-green-500';
+    }
+    return 'bg-slate-200';
+  }
   const constants = Constants.statusBarHeight;
   return (
     <View className="flex-1">
@@ -160,20 +171,26 @@ export default function FormEndereco({ keyId }: FormEndereco) {
             />
           </View>
 
+          {
+            controleDeComponente.isLoading && (
+              <LoadingSpinner />
+            )
+          }
+
           {/* Botões */}
           <View className="flex-row justify-between items-center w-full mt-4">
             <Pressable
               onPress={() => { handleAddNewEndereco(controleDeComponente.endereco); setControleDeComponente((prevState: any) => ({ ...prevState, endereco: { cep: '', rua: '', cidade: '', complemento: '' } })) }}
-              className={`flex justify-center items-center py-2 border border-slate-400 ${submitColor()} text-lg w-20 opacity-80 rounded-lg`}
+              className={`flex justify-center items-center py-2 border border-slate-400 ${submitColor()} w-20 opacity-80 rounded-lg`}
             >
-              <Text>Salvar</Text>
+              <Text className='text-md'>Salvar</Text>
             </Pressable>
 
             <Pressable
               onPress={handleCreateRegister}
-              className={`flex justify-center items-center py-2 border border-slate-400 bg-slate-200 text-lg w-20 opacity-80 rounded-lg ${register.endereco.length >= 1 && 'bg-green-500'}`}
+              className={`flex justify-center items-center py-2 border border-slate-400 text-lg w-20 opacity-80 rounded-lg ${finalizarColor()}`}
             >
-              <Text>Finalizar</Text>
+              <Text className='text-md font-semibold'>Finalizar</Text>
             </Pressable>
           </View>
 
@@ -181,11 +198,18 @@ export default function FormEndereco({ keyId }: FormEndereco) {
             register.endereco.map((item, index) => (
               <View
                 key={index}
-                className="flex justify-end my-5 py-3 pl-5 border border-slate-400 bg-slate-200 opacity-80 w-full rounded-lg"
+                className="flex justify-end mb-2 mt-10 py-3 pl-5 border border-black bg-stone-800 opacity-80 w-full rounded-lg"
               >
-                <Pressable className="flex-row justify-between">
-                  <Text className="text-xl font-bold text-slate-800">{item.cidade}</Text>
-                  <Text className="mr-10 text-lg font-thin text-slate-500">press</Text>
+                <Pressable className="flex-col">
+                  <Text className="text-xl font-bold text-neutral-200"><Ionicons className='ml-5' name="location" size={15} color="white" /> {item.cidade}, <Text className="text-md italic text-neutral-200">{item.bairro}</Text></Text>
+                  
+                  <Text className="text-md font-thin text-neutral-200 ml-5">{item.rua}</Text>
+                  {
+                    item.complemento && (
+                      <Text className="text-md font-thin text-neutral-200 mt-1 ml-5">{item.complemento}</Text>
+                    )
+                  }
+
                 </Pressable>
               </View>
             ))

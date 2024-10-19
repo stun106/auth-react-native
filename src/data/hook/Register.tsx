@@ -22,7 +22,7 @@ export const useRegister = () => {
    
             const { status, data } = await RegisterService.createUsuario(registro);
             if (status !== 201) throw new Error("Erro ao Enviar dados para API!")
-            return data;
+            return status
        
     }, []);
 
