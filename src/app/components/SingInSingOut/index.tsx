@@ -20,12 +20,16 @@ export default function SingInSingOut({ key }: SingInSingOutProps) {
         </Text>
       </View>
       <View className='flex-row w-full p-5 justify-between'>
-        <Pressable>
+        <Pressable
+          onPress={() => {
+            router.push('/singin');
+          }}
+        >
           <Text className='text-slate-400'>Login</Text>
         </Pressable>
         <Pressable
           onPress={() => {
-            router.push("/singup")
+            router.push("/singup");
           }}>
           <Text className='text-slate-400'>Register</Text>
         </Pressable>

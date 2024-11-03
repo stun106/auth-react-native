@@ -5,6 +5,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react'
 import { RegisterContext } from '../../../data/context/Register';
 import { useRegister } from '../../../data/hook/Register';
 import { LoadingSpinner } from '../LoadingSpinner';
+import { useRouter } from 'expo-router';
 
 interface FormEndereco {
   keyId?: number;
@@ -13,6 +14,7 @@ interface FormEndereco {
 export default function FormEndereco({ keyId }: FormEndereco) {
   const { register, handleAddNewEndereco } = useContext(RegisterContext);
   const { createUser, getEnderecoByViaCep } = useRegister();
+  const route = useRouter();
   const [controleDeComponente, setControleDeComponente] = useState({
     isSwiper: false,
     status: 0,
@@ -60,26 +62,30 @@ export default function FormEndereco({ keyId }: FormEndereco) {
         console.error(`erro: ${controleDeComponente.status} - ao receber dados da api`, e)
       }
     }
-    if (controleDeComponente.endereco.cep.length < 8)
+    if (controleDeComponente.endereco.cep.length <= 8)
       fetchEnderecoViaCep();
   }, [controleDeComponente.endereco.cep]);
+  console.log(controleDeComponente.isfetch)
   
   const handleCreateRegister = async () => {
     try {
       const statusCode = await createUser(register);
       setControleDeComponente(prevState => ({...prevState, status:statusCode, isLoading: true}));
+
       setInterval(() => {
         setControleDeComponente(prevState => ({...prevState, isLoading: false}));
-      },1000);
+      },2000);
 
-      //fadeOut
-      console.log('requisicão realizada com sucesso.')
+      if (!controleDeComponente.isLoading) return route.push('/singin');
+      
+      // fadeOut
+      console.log('requisicão realizada com sucesso.');
 
     } catch (er) {
-      console.error('erro ao realizar requisicão!', er)
+      console.error('erro ao realizar requisicão!', er);
     }
     finally {
-      console.log('deu tudo certo!')
+      console.log('deu tudo certo!');
     }
   }
 
@@ -95,9 +101,10 @@ export default function FormEndereco({ keyId }: FormEndereco) {
     }
     return 'bg-slate-200';
   }
+
   const constants = Constants.statusBarHeight;
   return (
-    <View className="flex-1">
+    <View className="relative flex-1">
       {/* Use ImageBackground para a imagem de fundo */}
       <ImageBackground
         source={require('../../assets/endereco-witches.gif')}
@@ -171,18 +178,13 @@ export default function FormEndereco({ keyId }: FormEndereco) {
             />
           </View>
 
-          {
-            controleDeComponente.isLoading && (
-              <LoadingSpinner />
-            )
-          }
 
           {/* Botões */}
           <View className="flex-row justify-between items-center w-full mt-4">
             <Pressable
               onPress={() => { handleAddNewEndereco(controleDeComponente.endereco); setControleDeComponente((prevState: any) => ({ ...prevState, endereco: { cep: '', rua: '', cidade: '', complemento: '' } })) }}
               className={`flex justify-center items-center py-2 border border-slate-400 ${submitColor()} w-20 opacity-80 rounded-lg`}
-            >
+              >
               <Text className='text-md'>Salvar</Text>
             </Pressable>
 
@@ -197,8 +199,8 @@ export default function FormEndereco({ keyId }: FormEndereco) {
           {register.endereco.length !== 0 ? (
             register.endereco.map((item, index) => (
               <View
-                key={index}
-                className="flex justify-end mb-2 mt-10 py-3 pl-5 border border-black bg-stone-800 opacity-80 w-full rounded-lg"
+              key={index}
+              className="flex justify-end mb-2 mt-10 py-3 pl-5 border border-black bg-stone-800 opacity-80 w-full rounded-lg"
               >
                 <Pressable className="flex-col">
                   <Text className="text-xl font-bold text-neutral-200"><Ionicons className='ml-5' name="location" size={15} color="white" /> {item.cidade}, <Text className="text-md italic text-neutral-200">{item.bairro}</Text></Text>
@@ -214,7 +216,14 @@ export default function FormEndereco({ keyId }: FormEndereco) {
               </View>
             ))
           ) : null
-          }
+        }
+      {
+        controleDeComponente.isLoading && (
+          <View className='mt-10'>
+            <LoadingSpinner />
+          </View>
+        )
+      }
         </ScrollView>
       </ImageBackground>
     </View>
